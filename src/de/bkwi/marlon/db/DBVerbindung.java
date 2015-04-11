@@ -1,4 +1,4 @@
-package paketName_muss_noch_angepasst_werden;
+package de.bkwi.marlon.db;
 
 import java.sql.*;
 
