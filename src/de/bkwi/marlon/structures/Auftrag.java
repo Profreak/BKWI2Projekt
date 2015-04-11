@@ -1,6 +1,8 @@
-package de.bkwi.marlon.model;
+package de.bkwi.marlon.structures;
 
 /**
+ * 
+ * Diese Klasse symbolisiert einen Auftrag
  * 
  * @author Marlon Kanngießer
  *
@@ -12,14 +14,14 @@ public class Auftrag {
 	private Kunde vonKunde;
 
 	/**
-	 * 
+	 * Erstellt einen neuen Auftrag
 	 */
 	public Auftrag() {
 
 	}
 
 	/**
-	 * @return the aufNr
+	 * @return die Auftragsnummer
 	 */
 	public String getAufNr() {
 		return aufNr;
@@ -34,7 +36,7 @@ public class Auftrag {
 	}
 
 	/**
-	 * @return the aufDat
+	 * @return das Auftragsdatum
 	 */
 	public String getAufDat() {
 		return aufDat;
@@ -49,7 +51,7 @@ public class Auftrag {
 	}
 
 	/**
-	 * @return the vonKunde
+	 * @return den Kunden
 	 */
 	public Kunde getVonKunde() {
 		return vonKunde;

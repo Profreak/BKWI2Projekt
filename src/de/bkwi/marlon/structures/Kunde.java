@@ -1,6 +1,8 @@
-package de.bkwi.marlon.model;
+package de.bkwi.marlon.structures;
 
 /**
+ * 
+ * Diese Klasse symbolisiert einen Kunden
  * 
  * @author Marlon Kanngieﬂer
  *
@@ -9,34 +11,35 @@ public class Kunde {
 
 	private String kdName;
 	private String kdNr;
-	
+
 	/**
-	 * 
+	 * Erstellt einen Kunden
 	 */
-	public Kunde(String kdNr){
+	public Kunde(String kdNr) {
 		this.kdNr = kdNr;
 	}
 
 	/**
-	 * @return the kdName
+	 * @return den Name des kunden
 	 */
 	public String getKdName() {
 		return kdName;
 	}
 
 	/**
-	 * @param kdName the kdName to set
+	 * @param kdName
+	 *            the kdName to set
 	 */
 	public void setKdName(String kdName) {
 		this.kdName = kdName;
 	}
-	
+
 	/**
 	 * 
-	 * @return the Kundennummer
+	 * @return die Kundennummer
 	 */
-	public String getKdNr(){
+	public String getKdNr() {
 		return kdNr;
 	}
-	
+
 }

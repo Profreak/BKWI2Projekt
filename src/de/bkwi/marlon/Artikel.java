@@ -7,10 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.bkwi.marlon.db.DBVerbindung;
-import de.bkwi.marlon.model.Auftrag;
-import de.bkwi.marlon.model.Kunde;
+import de.bkwi.marlon.structures.Auftrag;
+import de.bkwi.marlon.structures.Kunde;
 
 /**
+ * 
+ * Diese Klasse hat die Aufgabe anhand einer Artikelnummer, die Daten zu dem
+ * entsprechendem Artikel aufzurufen und zu speichern.
  * 
  * @author Marlon Kanngießer
  *
@@ -24,134 +27,148 @@ public class Artikel {
 
 	/**
 	 * 
-	 */
-	public Artikel() {
-
-	}
-
-	/**
+	 * Konstruiert einen neuen Artikel indem es sich mit einer SQL Datenbank
+	 * verbindet und die entsprechenden Daten aufruft.
 	 * 
 	 * @param inputText
+	 *            die Artikelnummer
 	 * @throws SQLException
+	 *             wird geworfen, wenn ein SQL Fehler vorliegt.
+	 * @throws NotExsistingAtrNrException
+	 *             wird geworfen, wenn die Artikelnummer nicht exsistiert.
 	 */
 	public Artikel(String inputText) throws SQLException, NotExsistingAtrNrException {
 
-		artNr = inputText;
-
+		// Datenbank verbinden
 		aktZugriff = new DBVerbindung();
-		if(!aktZugriff.oeffneDB()) throw new SQLException();
+		if (!aktZugriff.oeffneDB())
+			throw new SQLException();
 
+		// benötigte Variablen zuweisen
+		artNr = inputText;
 		ResultSet rs;
+		int cols = 0;
+		List<Auftrag> list = new ArrayList<Auftrag>();
+		List<Kunde> kunden = new ArrayList<Kunde>();
 
 		// Bezeichnung
 
-		rs = aktZugriff
-				.leseDB("SELECT bezeichnung FROM artikel WHERE artikelnr = '"
-						+ artNr + "'");
+		// abfrage der Bezeichnung
+		rs = aktZugriff.leseDB("SELECT bezeichnung FROM artikel WHERE artikelnr = '" + artNr + "'");
 
-		int cols = 0;
-		
+		// Resultset durchgehen
 		if (rs.next()) {
 			bez = rs.getString(1);
 			cols++;
 		}
-		
-		if(cols == 0){
+
+		// Fehler schmeißen, wenn kein Eintrag gefunden wurde
+		if (cols == 0) {
 			throw new NotExsistingAtrNrException();
 		}
 
+		// Resultset schließen
+		rs.close();
+
 		// Aufträge
 
-		rs.close();
+		// Auftragsnummer abfragen
+		rs = aktZugriff.leseDB("SELECT aufnr FROM auftragspositionen WHERE artikelnr = '" + artNr + "'");
 
-		rs = aktZugriff
-				.leseDB("SELECT aufnr FROM auftragspositionen WHERE artikelnr = '"
-						+ artNr + "'");
-
-		cols = rs.getMetaData().getColumnCount();
-
-
-		List<Auftrag> list = new ArrayList<Auftrag>();
-		
+		// alle Aufträge als Objekte erzeugen
 		while (rs.next()) {
 
-				Auftrag a = new Auftrag();
-				a.setAufNr(rs.getString(1));
+			Auftrag a = new Auftrag();
+			a.setAufNr(rs.getString(1));
 
-				list.add(a);
+			list.add(a);
 
 		}
+
+		// initialisierung von inAuftrag anhand der Anzahl der Auftragsnummern
 		inAuftrag = new Auftrag[list.size()];
-		
-		
-		for(int i = 0; i < list.size(); i++){
+
+		// konvertierung der List zu einem Array
+		for (int i = 0; i < list.size(); i++) {
 			inAuftrag[i] = list.get(i);
 		}
-		
-		
 
+		// Resultset schließen
 		rs.close();
 
-		List<Kunde> kunden = new ArrayList<Kunde>();
-
+		// alle Aufträge durchgehen und Auftragsdatum und kunde hinzufügen
 		for (int i = 0; i < inAuftrag.length; i++) {
 
+			// temporäre variabeln
 			Auftrag current = inAuftrag[i];
 			String kdNr = "";
 
-			rs = aktZugriff
-					.leseDB("SELECT kdNr, aufdat FROM auftragskoepfe WHERE aufnr = '"
-							+ current.getAufNr() + "'");
+			// abfrage der kundennummer und auftragssdatum
+			rs = aktZugriff.leseDB("SELECT kdNr, aufdat FROM auftragskoepfe WHERE aufnr = '" + current.getAufNr() + "'");
 
-			cols = rs.getMetaData().getColumnCount();
-
+			// hinzufügen der Abfrage in die temporären Variabeln
 			if (rs.next()) {
 				kdNr = rs.getString(1);
 				current.setAufDat(rs.getString(2));
 			}
 
+			// Resultset schließen
 			rs.close();
+
 			// Kunden
 
+			// schauen ob der Kunde schon erstellt wurde
 			Kunde kunde = getKunde(kdNr, kunden);
-			if(kunde == null) {
-				rs = aktZugriff.leseDB("SELECT name FROM kunden WHERE kdnr = '" + kdNr
-						+ "'");
+			// falls er nicht erstellt wurde abfrage des Namen des Kunden
+			if (kunde == null) {
 
+				rs = aktZugriff.leseDB("SELECT name FROM kunden WHERE kdnr = '" + kdNr + "'");
+
+				// hinzufügen des Kunden zu des Auftrags Objekt und zu der Liste
+				// aller schon vorhandenen Kunden
 				if (rs.next()) {
 					kunde = new Kunde(kdNr);
 					kunde.setKdName(rs.getString(1));
-					
+
 					kunden.add(kunde);
 
 				}
-			} 
-			
-			
+			}
+
 			current.setVonKunde(kunde);
 
 		}
 
-		if(!aktZugriff.schliesseDB()) throw new SQLException();
+		// schließen der Datenbank verbindung
+		if (!aktZugriff.schliesseDB())
+			throw new SQLException();
 	}
 
 	/**
 	 * 
+	 * Diese Helper Methode gibt einen bereits vorhanden Kunden oder null
+	 * zurück.
+	 * 
 	 * @param kdNr
+	 *            die eindeutige Kundennummer
 	 * @param kunden
-	 * @return
+	 *            die liste der vorhandenen Kunden
+	 * @return null wenn der Kunde noch nicht erstellt wurde
 	 */
-	private Kunde getKunde(String kdNr,List<Kunde> kunden){
+	private Kunde getKunde(String kdNr, List<Kunde> kunden) {
 		for (Kunde value : kunden) {
+			// Wenn die Kundennummer exsistiert dann gib das entsprechende
+			// Objekt zurück
 			if (value.getKdNr().equals(kdNr)) {
 				return value;
 			}
 		}
 		return null;
 	}
-	
+
 	/**
-	 * @return the artNr
+	 * 
+	 * @return die Artikelnummer
 	 */
 	public String getArtNr() {
 		return artNr;
@@ -166,7 +183,7 @@ public class Artikel {
 	}
 
 	/**
-	 * @return the bez
+	 * @return die Bezeichnung
 	 */
 	public String getBez() {
 		return bez;
@@ -174,14 +191,14 @@ public class Artikel {
 
 	/**
 	 * @param bez
-	 *            the bez to set
+	 *            die Bezeichnung zum setzen
 	 */
 	public void setBez(String bez) {
 		this.bez = bez;
 	}
 
 	/**
-	 * @return the inAuftrag
+	 * @return alle vorhandenen Aufträge
 	 */
 	public Auftrag[] getInAuftrag() {
 		return inAuftrag;
@@ -189,7 +206,7 @@ public class Artikel {
 
 	/**
 	 * @param inAuftrag
-	 *            the inAuftrag to set
+	 *            setzet die vorhandenen Aufträge
 	 */
 	public void setInAuftrag(Auftrag[] inAuftrag) {
 		this.inAuftrag = inAuftrag;

@@ -1,8 +1,11 @@
 package de.bkwi.marlon;
 
-import de.bkwi.marlon.model.Auftrag;
+import de.bkwi.marlon.structures.Auftrag;
 
 /**
+ * 
+ * Diese Klasse formatiert einen Artikel zu einen Text, der in einem Textarea
+ * ausgegeben werden kann.
  * 
  * @author Marlon Kanngießer
  *
@@ -11,31 +14,37 @@ public class TextFormatter {
 
 	/**
 	 * 
+	 * formatiert einen Artikel in ein passendes Format
+	 * 
 	 * @param artikel
-	 * @return
+	 *            der zu formatierende Artikel
+	 * @return einen String mit formartiertem Text in deutsch
 	 */
 	public static String formatterArtikel(Artikel artikel) {
 
-		if(artikel == null  || artikel.getArtNr() == null){
+		// Fehler falls notwendige Variablen null sind
+		if (artikel == null || artikel.getArtNr() == null) {
 			return TextFormatter.formatterErrorMessage("Der Artikel wurde nicht gefunden!");
 		}
-		
-		
+
 		String text = "Artikelbeschreibung: \n\n";
 		text += "\tArtikelNr: \t" + artikel.getArtNr() + "\n";
 		text += "\tBezeichnung: \t";
-		
-		if(artikel.getBez() == null) {
+
+		// Bezeichnung könnte nicht vorhanden sein
+		if (artikel.getBez() == null) {
 			text += artikel.getBez() + "\n\n";
 		} else {
 			text += "Keine Bezeichnung vorhanden" + "\n\n";
 		}
-		
+
 		Auftrag[] auftrag = artikel.getInAuftrag();
 
+		// ausgabe falls keine Auftrag vorhanden ist
 		if (auftrag == null || auftrag.length == 0) {
-				text += "\tDieser Artikel ist nicht Teil eines Auftrages! \n";
+			text += "\tDieser Artikel ist nicht Teil eines Auftrages! \n";
 		} else {
+			// ausgabe falls Aufträge vorhanden sind
 			text += "\tDer Artikel befindet sich in folgenden Aufträgen: \n\n";
 			for (int i = 0; i < auftrag.length; i++) {
 				Auftrag a = auftrag[i];
@@ -51,8 +60,11 @@ public class TextFormatter {
 
 	/**
 	 * 
+	 * Formatiert eine Fehlermeldung
+	 * 
 	 * @param string
-	 * @return
+	 *            die zu formatierende Fehlermeldung
+	 * @return eine formatierte Fehlermeldung
 	 */
 	public static String formatterErrorMessage(String string) {
 		return "\n\tFehler!: " + string;
