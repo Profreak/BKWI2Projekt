@@ -1,5 +1,8 @@
 package de.bkwi.marlon;
 
+import de.bkwi.marlon.db.DBVerbindung;
+import de.bkwi.marlon.model.Auftrag;
+
 /**
  * 
  * @author Marlon Kanngieﬂer
@@ -9,7 +12,7 @@ public class Artikel {
 
 	private String artNr;
 	private String bez;
-	private Auftrag inAuftrag;
+	private Auftrag[] inAuftrag;
 	private DBVerbindung aktZugriff;
 
 	/**
@@ -52,7 +55,7 @@ public class Artikel {
 	/**
 	 * @return the inAuftrag
 	 */
-	public Auftrag getInAuftrag() {
+	public Auftrag[] getInAuftrag() {
 		return inAuftrag;
 	}
 
@@ -60,7 +63,7 @@ public class Artikel {
 	 * @param inAuftrag
 	 *            the inAuftrag to set
 	 */
-	public void setInAuftrag(Auftrag inAuftrag) {
+	public void setInAuftrag(Auftrag[] inAuftrag) {
 		this.inAuftrag = inAuftrag;
 	}
 

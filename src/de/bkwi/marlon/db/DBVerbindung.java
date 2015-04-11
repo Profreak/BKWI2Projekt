@@ -1,4 +1,4 @@
-package de.bkwi.marlon;
+package de.bkwi.marlon.db;
 
 public interface DBVerbindung {
 
