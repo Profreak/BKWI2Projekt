@@ -8,12 +8,13 @@ package de.bkwi.marlon.model;
 public class Kunde {
 
 	private String kdName;
+	private String kdNr;
 	
 	/**
 	 * 
 	 */
-	public Kunde(){
-		
+	public Kunde(String kdNr){
+		this.kdNr = kdNr;
 	}
 
 	/**
@@ -28,6 +29,14 @@ public class Kunde {
 	 */
 	public void setKdName(String kdName) {
 		this.kdName = kdName;
+	}
+	
+	/**
+	 * 
+	 * @return the Kundennummer
+	 */
+	public String getKdNr(){
+		return kdNr;
 	}
 	
 }

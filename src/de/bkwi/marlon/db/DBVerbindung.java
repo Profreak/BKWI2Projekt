@@ -6,6 +6,7 @@ public class DBVerbindung
 {
 	private	Statement stmtSQL;  // Objekt für die Ausführung von SQL-Anweisungen
 	private Connection dieVerbindung;
+	private final String ip = "jdbc:mysql://localhost:3306/haro";
 	
 	public DBVerbindung()
 	{
@@ -19,7 +20,7 @@ public class DBVerbindung
 			//JDBC-Treiber für mySQL registrieren und instanziieren
 			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
 			//Verbindung zur DB wird mit getConnection() über einen String hergestellt
-			dieVerbindung = DriverManager.getConnection("jdbc:mysql://127.0.0.1/haro","root","");
+			dieVerbindung = DriverManager.getConnection(ip ,"root","");
 			//Objekt vom Typ Statement zur Anwendung an der Haro-DB erzeugen
 			stmtSQL = dieVerbindung.createStatement();
 			}

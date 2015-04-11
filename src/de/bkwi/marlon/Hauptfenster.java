@@ -11,15 +11,24 @@ import javax.swing.BoxLayout;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
 
 public class Hauptfenster extends JFrame {
 
 	private JPanel contentPane;
 
 	private Artikel aktArt;
-	private JTextField textField;
+	private JTextField input;
+	
+	private JTextArea output;
+	
+	private static final int INPUT_MAX_LENGTH = 5;
+	
 	
 	/**
 	 * Launch the application.
@@ -30,6 +39,7 @@ public class Hauptfenster extends JFrame {
 				try {
 					Hauptfenster frame = new Hauptfenster();
 					frame.setVisible(true);
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -48,23 +58,46 @@ public class Hauptfenster extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		textField = new JTextField();
-		textField.addKeyListener(new KeyAdapter() {
+		input = new JTextField();
+		input.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				
-				
+				int key = e.getKeyCode();
+			
+				if(key == KeyEvent.VK_ENTER){
+					
+					String inputText =  input.getText();
+					inputText.trim();
+					
+					if(inputText.length() <= INPUT_MAX_LENGTH && inputText.length()  > 0){
+						
+						try {
+							aktArt = new Artikel(inputText);
+						} catch (SQLException e1) {
+							output.setText("\n\tSQL ERROR!");
+							e1.printStackTrace();
+						}
+						output.setText(TextFormatter.formatterArtikel(aktArt));
+						
+					} else {
+						
+						output.setText("\nArtikelnummer weder leer noch länger als 5 Zeichen sein!");
+					}
+					
+					
+				}
 				
 			}
 		});
-		textField.setBounds(108, 11, 316, 28);
-		contentPane.add(textField);
-		textField.setColumns(10);
+		input.setBounds(108, 11, 316, 28);
+		contentPane.add(input);
+		input.setColumns(10);
 		
-		JTextArea textArea = new JTextArea();
-		textArea.setEditable(false);
-		textArea.setBounds(10, 50, 414, 200);
-		contentPane.add(textArea);
+		output = new JTextArea();
+		output.setEditable(false);
+		output.setBounds(10, 50, 414, 200);
+		contentPane.add(output);
 		
 		JLabel lblArtikelnummer = new JLabel("Artikelnummer");
 		lblArtikelnummer.setHorizontalAlignment(SwingConstants.CENTER);
