@@ -27,12 +27,12 @@ public class TextFormatter {
 			return TextFormatter.formatterErrorMessage("Der Artikel wurde nicht gefunden!");
 		}
 
-		String text = "Artikelbeschreibung: \n\n";
+		String text = "\n Artikelbeschreibung: \n\n";
 		text += "\tArtikelNr: \t" + artikel.getArtNr() + "\n";
 		text += "\tBezeichnung: \t";
 
 		// Bezeichnung könnte nicht vorhanden sein
-		if (artikel.getBez() == null) {
+		if (artikel.getBez() != null) {
 			text += artikel.getBez() + "\n\n";
 		} else {
 			text += "Keine Bezeichnung vorhanden" + "\n\n";
@@ -48,9 +48,9 @@ public class TextFormatter {
 			text += "\tDer Artikel befindet sich in folgenden Aufträgen: \n\n";
 			for (int i = 0; i < auftrag.length; i++) {
 				Auftrag a = auftrag[i];
-				text += "\tAuftragNr: \t" + a.getAufNr() + "\n";
+				text += "\tAuftragNr: \t\t" + a.getAufNr() + "\n";
 				text += "\t-> Auftragdatum: \t" + a.getAufDat() + "\n";
-				text += "\t->Kunde: \t" + a.getVonKunde().getKdName() + "\n";
+				text += "\t-> Kunde: \t\t" + a.getVonKunde().getKdName() + "\n";
 				text += "\t\n";
 			}
 		}
