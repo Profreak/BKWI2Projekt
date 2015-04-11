@@ -34,7 +34,7 @@ public class Artikel {
 	 * @param inputText
 	 * @throws SQLException
 	 */
-	public Artikel(String inputText) throws SQLException {
+	public Artikel(String inputText) throws SQLException, NotExsistingAtrNrException {
 
 		artNr = inputText;
 
@@ -49,10 +49,15 @@ public class Artikel {
 				.leseDB("SELECT bezeichnung FROM artikel WHERE artikelnr = '"
 						+ artNr + "'");
 
-		int cols = rs.getMetaData().getColumnCount();
-
+		int cols = 0;
+		
 		if (rs.next()) {
 			bez = rs.getString(1);
+			cols++;
+		}
+		
+		if(cols == 0){
+			throw new NotExsistingAtrNrException();
 		}
 
 		// Aufträge
@@ -65,18 +70,25 @@ public class Artikel {
 
 		cols = rs.getMetaData().getColumnCount();
 
-		inAuftrag = new Auftrag[cols];
 
+		List<Auftrag> list = new ArrayList<Auftrag>();
+		
 		while (rs.next()) {
-			for (int i = 1; i <= cols; i++) {
 
 				Auftrag a = new Auftrag();
 				a.setAufNr(rs.getString(1));
 
-				inAuftrag[i - 1] = a;
+				list.add(a);
 
-			}
 		}
+		inAuftrag = new Auftrag[list.size()];
+		
+		
+		for(int i = 0; i < list.size(); i++){
+			inAuftrag[i] = list.get(i);
+		}
+		
+		
 
 		rs.close();
 
@@ -88,7 +100,7 @@ public class Artikel {
 			String kdNr = "";
 
 			rs = aktZugriff
-					.leseDB("SELECT aufnr, aufdat FROM auftragskoepfe WHERE aufnr = '"
+					.leseDB("SELECT kdNr, aufdat FROM auftragskoepfe WHERE aufnr = '"
 							+ current.getAufNr() + "'");
 
 			cols = rs.getMetaData().getColumnCount();
@@ -99,28 +111,45 @@ public class Artikel {
 			}
 
 			rs.close();
+			// Kunden
 
-			rs = aktZugriff.leseDB("SELECT name FROM kunden WHERE kdnr = '" + kdNr
-					+ "'");
+			Kunde kunde = getKunde(kdNr, kunden);
+			if(kunde == null) {
+				rs = aktZugriff.leseDB("SELECT name FROM kunden WHERE kdnr = '" + kdNr
+						+ "'");
 
-			if (rs.next()) {
-				Kunde kunde = new Kunde(kdNr);
-				kunde.setKdName(rs.getString(1));
+				if (rs.next()) {
+					kunde = new Kunde(kdNr);
+					kunde.setKdName(rs.getString(1));
+					
+					kunden.add(kunde);
 
-				for (Kunde value : kunden) {
-					if (value.getKdNr().equals(kunde)) {
-						kunde = value;
-					}
 				}
-
-				current.setVonKunde(kunde);
-			}
+			} 
+			
+			
+			current.setVonKunde(kunde);
 
 		}
 
 		if(!aktZugriff.schliesseDB()) throw new SQLException();
 	}
 
+	/**
+	 * 
+	 * @param kdNr
+	 * @param kunden
+	 * @return
+	 */
+	private Kunde getKunde(String kdNr,List<Kunde> kunden){
+		for (Kunde value : kunden) {
+			if (value.getKdNr().equals(kdNr)) {
+				return value;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * @return the artNr
 	 */

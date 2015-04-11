@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.BoxLayout;
 import javax.swing.JTextField;
@@ -23,9 +24,9 @@ public class Hauptfenster extends JFrame {
 	private JPanel contentPane;
 
 	private Artikel aktArt;
-	private JTextField input;
+	private JTextField textField;
 	
-	private JTextArea output;
+	private JTextArea textArea;
 	
 	private static final int INPUT_MAX_LENGTH = 5;
 	
@@ -52,14 +53,14 @@ public class Hauptfenster extends JFrame {
 	 */
 	public Hauptfenster() {
 		setDefaultCloseOperation(Hauptfenster.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 485);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		input = new JTextField();
-		input.addKeyListener(new KeyAdapter() {
+		textField = new JTextField();
+		textField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				
@@ -67,7 +68,7 @@ public class Hauptfenster extends JFrame {
 			
 				if(key == KeyEvent.VK_ENTER){
 					
-					String inputText =  input.getText();
+					String inputText =  textField.getText();
 					inputText.trim();
 					
 					if(inputText.length() <= INPUT_MAX_LENGTH && inputText.length()  > 0){
@@ -75,14 +76,18 @@ public class Hauptfenster extends JFrame {
 						try {
 							aktArt = new Artikel(inputText);
 						} catch (SQLException e1) {
-							output.setText("\n\tSQL ERROR!");
+							textArea.setText(TextFormatter.formatterErrorMessage("SQL Fehler!"));
+							e1.printStackTrace();
+							
+						} catch (NotExsistingAtrNrException e1) {
+							textArea.setText(TextFormatter.formatterErrorMessage("Diese Artikelnummer exsistiert nicht!"));
 							e1.printStackTrace();
 						}
-						output.setText(TextFormatter.formatterArtikel(aktArt));
+						textArea.setText(TextFormatter.formatterArtikel(aktArt));
 						
 					} else {
 						
-						output.setText("\nArtikelnummer weder leer noch länger als 5 Zeichen sein!");
+						textArea.setText("\nArtikelnummer darf weder leer noch länger als 5 Zeichen sein!");
 					}
 					
 					
@@ -90,14 +95,17 @@ public class Hauptfenster extends JFrame {
 				
 			}
 		});
-		input.setBounds(108, 11, 316, 28);
-		contentPane.add(input);
-		input.setColumns(10);
+		textField.setBounds(108, 11, 316, 28);
+		contentPane.add(textField);
+		textField.setColumns(10);
 		
-		output = new JTextArea();
-		output.setEditable(false);
-		output.setBounds(10, 50, 414, 200);
-		contentPane.add(output);
+		JScrollPane scroll = new JScrollPane();
+		scroll.setBounds(10, 50, 414, 385);
+		contentPane.add(scroll, BorderLayout.CENTER);
+		
+		textArea = new JTextArea();
+		scroll.setViewportView(textArea);
+		textArea.setEditable(false);
 		
 		JLabel lblArtikelnummer = new JLabel("Artikelnummer");
 		lblArtikelnummer.setHorizontalAlignment(SwingConstants.CENTER);
