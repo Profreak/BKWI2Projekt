@@ -50,7 +50,7 @@ public class TextFormatter {
 				Auftrag a = auftrag[i];
 				text += "\tAuftragNr: \t" + a.getAufNr() + "\n";
 				text += "\t-> Auftragdatum: \t" + a.getAufDat() + "\n";
-				text += "\tKunde: \t" + a.getVonKunde().getKdName() + "\n";
+				text += "\t->Kunde: \t" + a.getVonKunde().getKdName() + "\n";
 				text += "\t\n";
 			}
 		}
